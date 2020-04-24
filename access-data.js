@@ -22,6 +22,7 @@ function init_data()
   const client = new MongoClient(uri, { useNewUrlParser: true });
   client.connect(err => {
     const collection = client.db("hw13").collection("companies");
+    collection.remove({});  //clear the collection
     collection.insertOne(entries, (err,res) => {
       if (err) {console.log("errors are things yeah")}
     });

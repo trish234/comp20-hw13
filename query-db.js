@@ -1,19 +1,18 @@
 function query() {
   console.log("We're about to search for some data");
-  let result;
+  let result = {};
   const MongoClient = require('mongodb').MongoClient;
   const uri = "mongodb+srv://trishacox:CPzRnyUfB5hzdiTL@cluster0-wuexi.mongodb.net/test?retryWrites=true&w=majority";
   const client = new MongoClient(uri, { useNewUrlParser: true });
-  client.connect(err => {
+  client.connect((err) => {
     const collection = client.db("hw13").collection("companies");
-    // if it's by name search by company name
-    if (true){
-        result = JSON.parse(collection.find());
-    };
-    // if it's by ticker search by ticker
-    console.log("success querying database");
-    client.close();
+    result = collection.findOne().then((result) => {
+      client.close();
+      console.log(result.data);
+      return (result.data);
+    })      
   });
+
 }
 //console.log(result);
 //return the first entry you find

@@ -13,9 +13,24 @@
       <input id="user-input" type="text" />
       <button onClick="search()">Submit </button>
     </form>
+    <div id="things-here">
+    </div>
     <script>
       function search(){
-        
+        const request = new XMLHttpRequest();
+        request.open("GET","http://localhost:3000/query", true);
+        request.setRequestHeader('Access-Control-Allow-Origin', '*');
+        request.onreadystatechange = function() {
+          if (request.readyState == 4 && request.status == 200){
+            let data = request.response;
+            console.log("have response");
+            console.log(data);
+            document.getElementById("things-here").innerHTML = data;
+          } else if (request.readyState == 4 && request.status != 200) {
+             console.log("Something went wrong. Load failed.");
+          }
+        }
+        request.send();
       }
     </script>
 
