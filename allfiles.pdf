@@ -1,0 +1,119 @@
+Comp20 hw13
+Trisha Cox
+4/23/20
+Assignment does not work but here is the code anyways.
+
+INDEX.HTML--------------------------------------------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+  </head>
+  <body>
+    <form onsubmit="return false">
+      <input type="radio" id="company-name" name="type" value="company"/>
+      <label for="company-name">company name</label><br />
+      <input type="radio" id="stock-ticker" name="type" value="ticker"/>
+      <label for="stock-ticker">stock ticker</label><br />
+
+      <input id="user-input" type="text" />
+      <button onClick="search()">Submit </button>
+    </form>
+    <script>
+      function search(){
+        
+      }
+    </script>
+
+  </body>
+</html>
+
+
+SERVER.JS------------------------------------------------------------------------------------------
+const db = require('./access-data.js');
+const q = require('./query-db');
+
+//Server
+const http = require('http');
+const fs = require ('fs');
+const hostname = '127.0.0.1';
+const port = 3000;
+
+
+const server = http.createServer((req, res) => {
+  db.init_data();
+  res.writeHead(200, {'Content-Type': 'text/html'});
+  fs.readFile('index.html', function(error, data){
+    if (error) {
+      res.writeHead(404);
+      res.write('Error: file not found');
+    } else {
+      res.write(data);
+    }
+    res.end();
+  });
+  q.query();
+});
+
+server.listen(port, hostname, () => {
+  console.log(`Server running at http://${hostname}:${port}/`);
+});
+
+
+ACCESS-DATA.JS--------------------------------------------------------------------------------
+function init_data()
+{
+  console.log("in main");
+  //First read file
+  var readline = require('readline');
+  var fs = require('fs');
+
+  var myFile = readline.createInterface({
+    input: fs.createReadStream('companies.csv')
+  });
+  var entries = {"data":[]};
+  myFile.on('line', function (line) {
+    let string = line.split(",");
+    let entry = "{'name': '" + string[0] + "'," + " 'ticker':'" + string[1] + "'},";
+    entries.data += entry;
+    console.log(entries.data);
+  });
+
+  // (testing purposes) CPzRnyUfB5hzdiTL cluster0 access pass for trishacox
+  const MongoClient = require('mongodb').MongoClient;
+  const uri = "mongodb+srv://trishacox:CPzRnyUfB5hzdiTL@cluster0-wuexi.mongodb.net/test?retryWrites=true&w=majority";
+  const client = new MongoClient(uri, { useNewUrlParser: true });
+  client.connect(err => {
+    const collection = client.db("hw13").collection("companies");
+    collection.insertOne(entries, (err,res) => {
+      if (err) {console.log("errors are things yeah")}
+    });
+    console.log("success connecting to database");
+    client.close();
+  });
+  return;
+}
+module.exports = {init_data}
+
+
+QUERY-DB.JS------------------------------------------------------------------------------------------
+function query() {
+  console.log("We're about to search for some data");
+  let result;
+  const MongoClient = require('mongodb').MongoClient;
+  const uri = "mongodb+srv://trishacox:CPzRnyUfB5hzdiTL@cluster0-wuexi.mongodb.net/test?retryWrites=true&w=majority";
+  const client = new MongoClient(uri, { useNewUrlParser: true });
+  client.connect(err => {
+    const collection = client.db("hw13").collection("companies");
+    // if it's by name search by company name
+    if (true){
+        result = JSON.parse(collection.find());
+    };
+    // if it's by ticker search by ticker
+    console.log("success querying database");
+    client.close();
+  });
+}
+//console.log(result);
+//return the first entry you find
+module.exports = {query}

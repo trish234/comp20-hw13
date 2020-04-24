@@ -1,4 +1,5 @@
 const db = require('./access-data.js');
+const q = require('./query-db');
 
 //Server
 const http = require('http');
@@ -8,7 +9,7 @@ const port = 3000;
 
 
 const server = http.createServer((req, res) => {
-  db.main();
+  db.init_data();
   res.writeHead(200, {'Content-Type': 'text/html'});
   fs.readFile('index.html', function(error, data){
     if (error) {
@@ -19,6 +20,7 @@ const server = http.createServer((req, res) => {
     }
     res.end();
   });
+  q.query();
 });
 
 server.listen(port, hostname, () => {
